@@ -8,6 +8,9 @@
   <license>TODO: License declaration</license>
 
   <depend>rclpy</depend>
+  <depend>math</depend>
+  <depend>turtlesim</depend>
+  <depend>geometry_msg</depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
