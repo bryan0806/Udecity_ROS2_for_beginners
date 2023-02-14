@@ -6,6 +6,9 @@ import math
 
 from turtlesim.srv import Spawn
 from functools import partial
+
+from my_robot_interfaces.msg import Turtle
+from my_robot_interfaces.msg import TurtleArray
  
  
 class TurtleSpawner(Node): 
@@ -13,8 +16,16 @@ class TurtleSpawner(Node):
         super().__init__("turtle_spawner") 
         self.turtle_name_prefix_ = "turtle"
         self.turtle_counter_ = 0
+        self.alive_turtles_ = []
+        self.alive_turtles_publisher_ = self.create_publisher(
+            TurtleArray, "alive_turtles",10)
         self. spawn_turtle_timer_ = self.create_timer(2.0, self.spawn_new_turtle)
         self.get_logger().info("turtle spawner has been started.")
+
+    def publish_alive_turtles(self):
+        msg = TurtleArray()
+        msg.turtles = self.alive_turtles_
+        self.alive_turtles_publisher_.publish(msg)
 
     def spawn_new_turtle(self):
         self.turtle_counter_ += 1
@@ -43,6 +54,13 @@ class TurtleSpawner(Node):
         try:
             response = future.result()
             self.get_logger().info(" turtle " + response.name + " is now alive")
+            new_turtle = Turtle()
+            new_turtle.name = turtle_name
+            new_turtle.x = x
+            new_turtle.y = y
+            new_turtle.theta = theta
+            self.alive_turtles_.append(new_turtle)
+            self.publish_alive_turtles()
 
         except Exception as e:
             self.get_logger().error("serice call failed %r" % (e,))
